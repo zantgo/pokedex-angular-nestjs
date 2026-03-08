@@ -1,0 +1,57 @@
+# docker-compose.yml
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pokedex_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pokedex
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d pokedex"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: node:20-alpine
+    container_name: pokedex_backend
+    working_dir: /app
+    # Este comando instala dependencias en el vuelo y levanta el servidor con Hot Reload
+    command: sh -c "npm install && npm run start:dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=pokedex
+
+  frontend:
+    image: node:20-alpine
+    container_name: pokedex_frontend
+    working_dir: /app
+    # Instala dependencias y expone Angular al host (0.0.0.0 es clave en Docker)
+    command: sh -c "npm install && npm run start -- --host 0.0.0.0 --poll 500"
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+
+volumes:
+  postgres_data:
+  backend_node_modules:
+  frontend_node_modules:
