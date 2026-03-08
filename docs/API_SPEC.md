@@ -18,7 +18,7 @@ NestJS maneja las excepciones a través de un *Global Exception Filter*. Cualqui
 ```json
 {
   "statusCode": 400,
-  "message": [
+  "message":[
     "minWeight must be a number conforming to the specified constraints",
     "type must be a string"
   ],
@@ -55,12 +55,12 @@ Dispara el proceso asíncrono en el backend que consume la [PokeAPI](https://pok
 *   **Ruta:** `/pokemons/sync`
 *   **Body:** N/A
 
-**Respuesta Exitosa (`201 Created`):**
+**Respuesta Exitosa (`201 Created` / `202 Accepted`):**
 ```json
 {
   "status": "success",
   "message": "Sincronización completada exitosamente.",
-  "importedCount": 50
+  "importedCount": 150
 }
 ```
 
@@ -71,7 +71,7 @@ Devuelta si hay un error de red al contactar la API externa o un fallo en la per
 
 ### 3.2. Listar y Filtrar Pokémon
 Obtiene el listado de especímenes. Soporta paginación y filtrado avanzado. 
-*Nota de Arquitectura: La API espera los filtros numéricos en unidades humanas (Kilogramos y Centímetros) para facilitar la integración con la UI. El backend (`PokemonService`) se encargará de convertirlos a las unidades crudas de la BD (Hectogramos y Decímetros) antes de consultar.*
+*Nota de Arquitectura: Para mantener un contrato estandarizado y simétrico, la API espera los filtros numéricos en **unidades crudas** (Hectogramos y Decímetros), que son las mismas unidades que devuelve. El Frontend es responsable de realizar la conversión matemática (ej. kg a hg) antes de enviar la petición.*
 
 *   **Método:** `GET`
 *   **Ruta:** `/pokemons`
@@ -84,15 +84,15 @@ Obtiene el listado de especímenes. Soporta paginación y filtrado avanzado.
 | `limit` | `number` | Cantidad de registros por página (10, 25, 50). | `25` |
 | `search` | `string` | Búsqueda parcial por nombre (case-insensitive). | `pika` |
 | `type` | `string` | Filtro exacto por tipo biológico. | `grass` |
-| `minWeight` | `number` | Peso mínimo en **Kilogramos (kg)**. | `10.5` |
-| `maxWeight` | `number` | Peso máximo en **Kilogramos (kg)**. | `50.0` |
-| `minHeight` | `number` | Altura mínima en **Centímetros (cm)**. | `20` |
-| `maxHeight` | `number` | Altura máxima en **Centímetros (cm)**. | `150` |
+| `minWeight` | `number` | Peso mínimo en **Hectogramos (hg)**. | `105` |
+| `maxWeight` | `number` | Peso máximo en **Hectogramos (hg)**. | `500` |
+| `minHeight` | `number` | Altura mínima en **Decímetros (dm)**. | `2` |
+| `maxHeight` | `number` | Altura máxima en **Decímetros (dm)**. | `15` |
 | `sortBy` | `string` | Campo para ordenar (`id`, `name`, `weight`, `height`). | `weight` |
 | `sortOrder` | `string` | Dirección de ordenamiento (`ASC`, `DESC`). | `DESC` |
 
 **Ejemplo de Petición:**
-`GET /api/v1/pokemons?type=grass&minWeight=5&maxWeight=80&limit=10&page=1`
+`GET /api/v1/pokemons?type=grass&minWeight=50&maxWeight=800&limit=10&page=1`
 
 **Respuesta Exitosa (`200 OK`):**
 ```json
@@ -102,7 +102,7 @@ Obtiene el listado de especímenes. Soporta paginación y filtrado avanzado.
       "id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
       "pokedexId": 1,
       "name": "bulbasaur",
-      "types": ["grass", "poison"],
+      "types":["grass", "poison"],
       "height": 7,     
       "weight": 69     
     }
@@ -151,4 +151,3 @@ Devuelve los datos de un espécimen específico basado en su ID de la Pokedex Na
   "path": "/api/v1/pokemons/9999"
 }
 ```
-

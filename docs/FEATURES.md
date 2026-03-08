@@ -8,13 +8,13 @@ Este documento detalla las funcionalidades clave de la **Pokedex Analytics Platf
 
 ### 🔄 Ingesta Asíncrona (Smart Sync)
 *   **Problema:** La dependencia de una API de terceros (PokeAPI) en cada petición de búsqueda hace que el sistema sea lento y propenso a fallos.
-*   **Solución:** El backend (NestJS) expone un endpoint de sincronización que descarga los datos de PokeAPI, los normaliza y los persiste en una base de datos PostgreSQL local.
+*   **Solución:** El backend (NestJS) expone un endpoint de sincronización que descarga los datos de PokeAPI utilizando **Procesamiento por Lotes (Batching)** (ej. descargando y guardando en bloques de 50). Esto evita desbordamientos de memoria en el servidor y previene errores de *Gateway Timeout* (504). Tras descargar los datos, los normaliza y los persiste mediante un UPSERT en una base de datos PostgreSQL local.
 *   **Valor UX:** Se habilita la búsqueda instantánea una vez sincronizada la base local. Se incluye un feedback visual de carga en el Frontend durante todo el proceso.
 
 ### 🔍 Motor de Filtros Multidimensionales
 *   **Descripción:** Consola de filtros construida con `ReactiveFormsModule` de Angular.
 *   **Características Técnicas:**
-    *   **Backend QueryBuilder:** Los filtros de peso (kg) y altura (cm) son procesados por el backend, que realiza la conversión a las unidades crudas de la API (hg/dm) antes de ejecutar la consulta SQL. Esto asegura que la base de datos se mantenga como "Fuente Única de Verdad".
+    *   **Frontend-Driven Math & Backend QueryBuilder:** Para mantener un contrato de API simétrico, es el **Frontend** el que realiza la matemática inversa: cuando el usuario escribe "5 kg", Angular lo multiplica por 10 y envía `50 hg` a la API. El backend (NestJS) simplemente recibe el número en unidades crudas y lo pasa a su `QueryBuilder` de TypeORM para ejecutar la consulta SQL. Esto asegura que la base de datos se mantenga intacta como "Fuente Única de Verdad".
     *   **Debounce Time:** Implementación de `RxJS (debounceTime)` en el Frontend para ejecutar búsquedas 300ms después de que el usuario finalice su escritura, reduciendo el tráfico de red innecesario.
 
 ### 🎨 Transformación de Presentación Dinámica (Front-End Driven)
@@ -40,10 +40,10 @@ Este documento detalla las funcionalidades clave de la **Pokedex Analytics Platf
 3. Al finalizar, la lista de especímenes se actualiza automáticamente gracias a la reactividad de las Signals.
 
 ### Journey B: Filtrado de Especímenes (Análisis Científico)
-1. El investigador define criterios: **Tipo "Grass"**, **Peso entre 5kg y 30kg**.
-2. Al presionar "Analizar", Angular serializa los filtros como *Query Params*.
-3. NestJS recibe los parámetros, realiza las conversiones (5kg -> 50hg, 30kg -> 300hg) y ejecuta el `QueryBuilder`.
-4. La tabla se refresca con los resultados filtrados, mostrando las unidades convertidas gracias a los Pipes de Angular.
+1. El investigador define criterios visuales: **Tipo "Grass"**, **Peso entre 5kg y 30kg**.
+2. Al presionar "Analizar", Angular convierte los valores humanos a unidades crudas (5kg -> 50hg) y serializa los filtros como *Query Params*.
+3. NestJS recibe los parámetros en unidades crudas estandarizadas y ejecuta el `QueryBuilder` directamente en PostgreSQL.
+4. La tabla se refresca con los resultados filtrados, mostrando las unidades convertidas nuevamente gracias a los Pipes de Angular.
 
 ---
 
@@ -51,3 +51,4 @@ Este documento detalla las funcionalidades clave de la **Pokedex Analytics Platf
 
 *   **Error Handling Global:** Los errores del backend (400, 500) son interceptados por un `ErrorInterceptor` de Angular que muestra una notificación al usuario, evitando que la aplicación quede en un estado inconsistente.
 *   **Validación Estricta:** Gracias a los DTOs de NestJS, cualquier entrada de datos maliciosa o mal formada es rechazada por el backend antes de intentar consultar la base de datos, garantizando la integridad de PostgreSQL.
+```

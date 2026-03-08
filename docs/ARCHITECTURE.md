@@ -44,8 +44,8 @@ Actúa como una *Single Page Application* (SPA) reactiva. Su única responsabili
 
 ### B. Capa de Aplicación (Backend - NestJS)
 El corazón del sistema. Actúa como orquestador, protegiendo la base de datos y encapsulando las reglas de negocio. Sigue los principios de la **Clean Architecture**.
-*   **Controllers (Controladores):** Capa de entrada HTTP. Su única función es recibir peticiones, validar la entrada usando **DTOs (Data Transfer Objects)** fuertemente tipados con `class-validator`, y retornar la respuesta.
-*   **Services (Casos de Uso):** Contienen toda la lógica de negocio. Aquí ocurre la orquestación para consumir la PokeAPI externa, la conversión de unidades de los filtros (kg -> hg) y la preparación de los datos.
+*   **Controllers (Controladores):** Capa de entrada HTTP. Su única función es recibir peticiones, validar la entrada usando **DTOs (Data Transfer Objects)** fuertemente tipados con `class-validator` y retornar la respuesta. Además, se implementa el `ValidationPipe` global con `transform: true` y `enableImplicitConversion: true` para garantizar que los Query Params (strings en la URL) se conviertan automáticamente a números reales antes de llegar a la lógica.
+*   **Services (Casos de Uso):** Contienen toda la lógica de negocio. Aquí ocurre la orquestación para consumir la PokeAPI externa mediante procesamiento por lotes (*batching*) y la preparación de los datos para la persistencia.
 *   **Manejo Global de Excepciones:** Implementación de *Exception Filters* para capturar cualquier error (404, 500) y devolver al Frontend una estructura JSON estandarizada y segura.
 
 ### C. Capa de Persistencia (PostgreSQL + TypeORM)
@@ -70,18 +70,18 @@ Responsable del almacenamiento seguro y persistente de los datos analíticos.
 1. El usuario hace clic en "Sincronizar" en Angular.
 2. El `PokemonService` del Frontend despacha un `POST /api/pokemons/sync`.
 3. El `PokemonController` de NestJS recibe la petición y delega al `PokemonService`.
-4. El servicio realiza un `HTTP GET` masivo hacia la PokeAPI, normaliza la respuesta JSON, e invoca al `PokemonRepository`.
+4. El servicio realiza peticiones HTTP orquestadas por lotes (*Promise.all en chunks*) hacia la PokeAPI para evitar colapsar la memoria y prevenir *timeouts*, normaliza las respuestas JSON, e invoca al `PokemonRepository`.
 5. TypeORM ejecuta un `UPSERT` (o `get_or_create`) en PostgreSQL.
-6. El Backend responde `201 Created` al Frontend.
+6. El Backend responde `201 Created` (o `202 Accepted`) al Frontend.
 7. Las *Signals* de Angular reaccionan al éxito y refrescan la tabla de datos en pantalla.
 
 ---
-
 ## 5. Estrategia Arquitectónica de Pruebas (Testing)
 
-El sistema está diseñado para ser altamente testable desde el día cero:
-*   **Backend:** 
-    *   **Unitarias (Jest):** Los *Services* se prueban aislando la base de datos (mockeando los Repositories) y la red (mockeando llamadas HTTP externas).
-    *   **Integración (Supertest):** Se prueban los endpoints (`Controllers`) contra una base de datos en memoria o de pruebas para validar el ciclo completo de petición/respuesta.
-*   **Frontend:**
-    *   **Unitarias (Jasmine/Jest):** Se validan individualmente *Pipes* (ej. que 69 hg devuelva "6.9 kg"), *Services* (mockeando `HttpClient`) y *Components* (verificando que las interacciones del usuario actualicen las Signals correctamente).
+El sistema está diseñado para ser altamente testable desde el día cero, utilizando **Jest** como motor de pruebas estándar en ambas capas:
+
+*   **Backend (NestJS):** 
+    *   **Unitarias (Jest):** Los *Services* se prueban aislando la base de datos (mockeando los Repositories) y la red.
+    *   **Integración (Supertest):** Se validan los *Controllers* contra una base de datos de pruebas para asegurar el contrato de API.
+*   **Frontend (Angular):**
+    *   **Unitarias (Jest):** Se validan *Pipes* (ej. 69 hg -> 6.9 kg), *Services* (mockeando `HttpClient`) y la reactividad de los componentes usando `TestBed` y verificación de actualizaciones en las *Signals*.
