@@ -51,4 +51,3 @@ Este documento detalla las funcionalidades clave de la **Pokedex Analytics Platf
 
 *   **Error Handling Global:** Los errores del backend (400, 500) son interceptados por un `ErrorInterceptor` de Angular que muestra una notificación al usuario, evitando que la aplicación quede en un estado inconsistente.
 *   **Validación Estricta:** Gracias a los DTOs de NestJS, cualquier entrada de datos maliciosa o mal formada es rechazada por el backend antes de intentar consultar la base de datos, garantizando la integridad de PostgreSQL.
-```
