@@ -1,22 +1,6 @@
+node_modules
+dist
 .env
-
-# Node.js
-node_modules/
-dist/
-build/
-coverage/
-*.log
-.npm/
-
-# Docker
-.docker-compose.yml.swp
-postgres_data/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDEs
-.vscode/
-.idea/
-*.swp
+coverage
+backend/node_modules
+frontend/node_modules
