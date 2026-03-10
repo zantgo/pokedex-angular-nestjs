@@ -1,14 +1,25 @@
 # Makefile
 
-.PHONY: start stop clean logs test-back test-front
+.PHONY: start stop clean logs test-back test-front bash-back bash-front
 
 # Levanta todos los servicios en segundo plano
 start:
 	@echo "🚀 Iniciando Pokedex Analytics Platform..."
 	docker compose up -d
-	@echo "✅ Plataforma levantada."
+	@echo "⏳ Esperando a que el backend responda en el puerto 3000..."
+	@# Bucle que intenta conectar cada 5 segundos hasta un máximo de 20 intentos (100 segundos)
+	@n=0; until [ $$n -ge 20 ]; do \
+		curl -s http://localhost:3000/api/v1/pokemons > /dev/null && break; \
+		echo "   ...todavía no está listo, esperando 5 segundos..."; \
+		n=$$((n+1)); \
+		sleep 5; \
+	done
+	@echo "🔄 Ejecutando sincronización automática de la Pokedex..."
+	@curl -X POST http://localhost:3000/api/v1/pokemons/sync
+	@echo ""
+	@echo "✅ Plataforma levantada y sincronizada."
 	@echo "🌐 Frontend: http://localhost:4200"
-	@echo "🔌 Backend API: http://localhost:3000/api"
+	@echo "🔌 Backend API: http://localhost:3000/api/v1/pokemons"
 
 # Detiene los contenedores sin borrar datos
 stop:
@@ -31,12 +42,12 @@ test-back:
 	@echo "🧪 Ejecutando pruebas E2E del Backend..."
 	docker exec -it pokedex_backend npm run test:e2e
 
-# Ejecuta las pruebas del Frontend (Una sola vez, ideal para CI/CD)
+# Ejecuta las pruebas del Frontend
 test-front:
 	@echo "🧪 Ejecutando pruebas del Frontend..."
 	docker exec -it pokedex_frontend npm run test
 	
-# (EXTRA) Comando para entrar a la terminal de los contenedores si necesitas depurar
+# Comandos de depuración
 bash-back:
 	docker exec -it pokedex_backend /bin/sh
 
