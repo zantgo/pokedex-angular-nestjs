@@ -13,22 +13,23 @@
     </thead>
     <tbody>
       @for (poke of pokemons(); track poke.id) {
-        <tr class="hover:bg-gray-50">
-          <td class="p-3 border">{{ poke.pokedexId }}</td>
-          <td class="p-3 border">{{ poke.name | invertName }}</td>
+        <tr class="hover:bg-gray-50 cursor-pointer"[routerLink]="['/pokemon', poke.pokedexId]">
+          <td class="p-3 border text-blue-600 font-bold">#{{ poke.pokedexId }}</td>
+          <td class="p-3 border font-semibold">{{ poke.name | invertName }}</td>
           <td class="p-3 border">{{ poke.types.join(', ') }}</td>
           <td class="p-3 border">{{ poke.height | cm }}</td>
           <td class="p-3 border">{{ poke.weight | kg }}</td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="5" class="p-3 text-center">No se encontraron resultados.</td>
+          <td colspan="5" class="p-3 text-center text-gray-500">No se encontraron resultados. Intenta ajustar los filtros.</td>
         </tr>
       }
     </tbody>
   </table>
 
-  <div class="mt-4 text-sm text-gray-600">
-    Página {{ meta().currentPage }} de {{ meta().totalPages }}
+  <div class="mt-4 text-sm text-gray-600 flex justify-between">
+    <span>Total de especímenes: {{ meta().totalItems }}</span>
+    <span>Página {{ meta().currentPage }} de {{ meta().totalPages === 0 ? 1 : meta().totalPages }}</span>
   </div>
 }
