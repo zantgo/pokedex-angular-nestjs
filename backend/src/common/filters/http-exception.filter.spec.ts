@@ -29,7 +29,11 @@ describe('AllExceptionsFilter', () => {
   });
 
   it('should catch HttpException (400) and format it correctly', () => {
-    const exception = new HttpException('Bad Request Message', HttpStatus.BAD_REQUEST);
+    // NestJS normalmente envuelve el mensaje en un objeto si se pasa un objeto
+    const exception = new HttpException({
+      message: ['Bad Request Message'],
+      error: 'Bad Request'
+    }, HttpStatus.BAD_REQUEST);
 
     filter.catch(exception, mockArgumentsHost);
 
@@ -54,14 +58,18 @@ describe('AllExceptionsFilter', () => {
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
         statusCode: 500,
-        message: ['Internal Server Error'],
+        message: ['Unexpected crash'], 
+        error: 'Internal Server Error',
         path: '/api/v1/test',
       }),
     );
   });
 
   it('should catch 404 Exception', () => {
-    const exception = new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    const exception = new HttpException({
+      message: 'Not Found',
+      error: 'Not Found'
+    }, HttpStatus.NOT_FOUND);
 
     filter.catch(exception, mockArgumentsHost);
 
@@ -69,6 +77,7 @@ describe('AllExceptionsFilter', () => {
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
         statusCode: 404,
+        message: ['Not Found'],
         error: 'Not Found',
       }),
     );

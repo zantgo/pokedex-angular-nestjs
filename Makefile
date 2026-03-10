@@ -34,8 +34,8 @@ test-back:
 # Ejecuta las pruebas del Frontend (Una sola vez, ideal para CI/CD)
 test-front:
 	@echo "🧪 Ejecutando pruebas del Frontend..."
-	docker exec -it pokedex_frontend npm run test -- --run
-
+	docker exec -it pokedex_frontend npm run test
+	
 # (EXTRA) Comando para entrar a la terminal de los contenedores si necesitas depurar
 bash-back:
 	docker exec -it pokedex_backend /bin/sh

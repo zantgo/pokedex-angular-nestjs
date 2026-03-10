@@ -18,7 +18,7 @@ describe('PokemonService', () => {
       take: jest.fn().mockReturnThis(),
       getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
     }),
-    create: jest.fn(),
+    create: jest.fn().mockImplementation((dto) => dto), // Importante: retornar el objeto para el upsert
     upsert: jest.fn().mockResolvedValue({}),
   };
 
@@ -36,6 +36,9 @@ describe('PokemonService', () => {
     }).compile();
 
     service = module.get<PokemonService>(PokemonService);
+    
+    // Limpiar mocks antes de cada test
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -54,12 +57,12 @@ describe('PokemonService', () => {
 
   describe('sync', () => {
     it('should call PokeAPI and upsert data', async () => {
-      // Mock de respuesta de PokeAPI
-      mockHttpService.get.mockReturnValue(of({
+      // 1. Mock de la lista de URLs
+      mockHttpService.get.mockReturnValueOnce(of({
         data: { results: [{ url: 'http://test.com/1' }] }
       }));
 
-      // Mock de respuesta del detalle del pokemon
+      // 2. Mock de la respuesta del detalle de 1 Pokémon
       mockHttpService.get.mockReturnValueOnce(of({
         data: { 
           id: 1, 
@@ -73,6 +76,7 @@ describe('PokemonService', () => {
       const result = await service.sync();
       
       expect(result.status).toBe('success');
+      expect(mockRepository.create).toHaveBeenCalled();
       expect(mockRepository.upsert).toHaveBeenCalled();
     });
   });
