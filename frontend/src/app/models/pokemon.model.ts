@@ -19,3 +19,14 @@ export interface PokedexResponse {
     currentPage: number;
   };
 }
+
+export interface PokemonFilterParams {
+  search?: string;
+  type?: string;
+  minWeight?: number;
+  maxWeight?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  page?: number;  // <--- NUEVO
+  limit?: number; // <--- NUEVO
+}

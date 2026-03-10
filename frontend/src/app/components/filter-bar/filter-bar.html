@@ -1,1 +1,61 @@
-<p>filter-bar works!</p>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Consola de Filtros</h2>
+    <button
+      type="button"
+      (click)="clearFilters()"
+      class="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+    >
+      Limpiar todo
+    </button>
+  </div>
+
+  <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Nombre y Tipo -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-slate-600">NOMBRE / ESPECIE</label>
+      <input formControlName="search" placeholder="Ej: Pikachu" class="p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-slate-600">TIPO</label>
+      <select formControlName="type" class="p-2 border border-slate-300 rounded">
+        <option value="">- Todos los tipos -</option>
+        <option value="grass">Grass</option>
+        <option value="fire">Fire</option>
+        <option value="water">Water</option>
+        <option value="poison">Poison</option>
+        <option value="electric">Electric</option>
+      </select>
+    </div>
+
+    <!-- Transformación -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-slate-600">TRANSFORMACIÓN</label>
+      <select formControlName="transformation" class="p-2 border border-slate-300 rounded">
+        <option value="normal">Normal</option>
+        <option value="invert">Invertir Nombre</option>
+      </select>
+    </div>
+
+    <!-- Pesos y Alturas (Grid interno) -->
+    <div class="col-span-1 lg:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold text-slate-600">PESO MIN (KG)</label>
+        <input type="number" formControlName="minWeight" placeholder="0.0" class="p-2 border border-slate-300 rounded" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold text-slate-600">PESO MAX (KG)</label>
+        <input type="number" formControlName="maxWeight" placeholder="∞" class="p-2 border border-slate-300 rounded" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold text-slate-600">ALTURA MIN (CM)</label>
+        <input type="number" formControlName="minHeight" placeholder="0" class="p-2 border border-slate-300 rounded" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold text-slate-600">ALTURA MAX (CM)</label>
+        <input type="number" formControlName="maxHeight" placeholder="∞" class="p-2 border border-slate-300 rounded" />
+      </div>
+    </div>
+  </form>
+</div>
