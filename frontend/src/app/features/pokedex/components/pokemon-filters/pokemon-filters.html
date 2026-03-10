@@ -1,1 +1,6 @@
-<p>pokemon-filters works!</p>
+<form [formGroup]="filterForm" class="flex flex-wrap gap-4 p-4 border rounded">
+  <input formControlName="search" placeholder="Buscar por nombre..." class="border p-2" />
+  <input formControlName="type" placeholder="Tipo (ej. grass)" class="border p-2" />
+  <input formControlName="minWeight" type="number" placeholder="Peso mín (kg)" class="border p-2" />
+  <input formControlName="maxWeight" type="number" placeholder="Peso máx (kg)" class="border p-2" />
+</form>

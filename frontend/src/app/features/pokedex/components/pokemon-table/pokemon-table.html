@@ -1,1 +1,34 @@
-<p>pokemon-table works!</p>
+@if (isLoading()) {
+  <div class="text-center py-10">Cargando datos de la Pokedex...</div>
+} @else {
+  <table class="w-full border-collapse">
+    <thead>
+      <tr class="bg-gray-100 text-left">
+        <th class="p-3 border">ID</th>
+        <th class="p-3 border">Nombre</th>
+        <th class="p-3 border">Tipos</th>
+        <th class="p-3 border">Altura</th>
+        <th class="p-3 border">Peso</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (poke of pokemons(); track poke.id) {
+        <tr class="hover:bg-gray-50">
+          <td class="p-3 border">{{ poke.pokedexId }}</td>
+          <td class="p-3 border">{{ poke.name | invertName }}</td>
+          <td class="p-3 border">{{ poke.types.join(', ') }}</td>
+          <td class="p-3 border">{{ poke.height | cm }}</td>
+          <td class="p-3 border">{{ poke.weight | kg }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5" class="p-3 text-center">No se encontraron resultados.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="mt-4 text-sm text-gray-600">
+    Página {{ meta().currentPage }} de {{ meta().totalPages }}
+  </div>
+}

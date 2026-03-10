@@ -24,12 +24,21 @@ clean:
 logs:
 	docker compose logs -f
 
-# Ejecuta las pruebas del Backend
+# Ejecuta las pruebas del Backend (Unitarias + E2E)
 test-back:
-	@echo "🧪 Ejecutando pruebas del Backend..."
+	@echo "🧪 Ejecutando pruebas unitarias del Backend..."
 	docker exec -it pokedex_backend npm run test
+	@echo "🧪 Ejecutando pruebas E2E del Backend..."
+	docker exec -it pokedex_backend npm run test:e2e
 
-# Ejecuta las pruebas del Frontend
+# Ejecuta las pruebas del Frontend (Una sola vez, ideal para CI/CD)
 test-front:
 	@echo "🧪 Ejecutando pruebas del Frontend..."
-	docker exec -it pokedex_frontend npm run test
+	docker exec -it pokedex_frontend npm run test -- --run
+
+# (EXTRA) Comando para entrar a la terminal de los contenedores si necesitas depurar
+bash-back:
+	docker exec -it pokedex_backend /bin/sh
+
+bash-front:
+	docker exec -it pokedex_frontend /bin/sh
