@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PokemonFiltersComponent } from './pokemon-filters.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { vi } from 'vitest'; // Importación explícita para Vitest
+import { vi } from 'vitest';
 
 describe('PokemonFiltersComponent', () => {
   let component: PokemonFiltersComponent;
@@ -15,52 +15,50 @@ describe('PokemonFiltersComponent', () => {
     fixture = TestBed.createComponent(PokemonFiltersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    // Usamos los timers falsos nativos de Vitest
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    // Restauramos el tiempo real al terminar cada test
+    vi.useRealTimers();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should emit filterChange after debounceTime', fakeAsync(() => {
-    // Usamos vi.spyOn en lugar de jest.spyOn
+  it('should emit filterChange after debounceTime', () => {
     const spy = vi.spyOn(component.filterChange, 'emit');
 
-    // Cambiamos el valor del input search
     component.filterForm.patchValue({ search: 'pika' });
-
-    // En este punto, no debería haberse emitido nada aún por el debounceTime
     expect(spy).not.toHaveBeenCalled();
 
-    // Avanzamos el tiempo virtual en 300ms
-    tick(300);
+    // Avanzamos el reloj de Vitest
+    vi.advanceTimersByTime(300);
 
-    // Ahora sí debería haberse emitido el evento
     expect(spy).toHaveBeenCalledWith({ search: 'pika' });
-  }));
+  });
 
-  it('should clean empty values before emitting', fakeAsync(() => {
+  it('should clean empty values before emitting', () => {
     const spy = vi.spyOn(component.filterChange, 'emit');
 
-    // Emitimos con campos vacíos
     component.filterForm.patchValue({ search: '', type: 'grass' });
+    vi.advanceTimersByTime(300);
 
-    tick(300);
-
-    // El objeto filtrado solo debe tener 'type'
     expect(spy).toHaveBeenCalledWith({ type: 'grass' });
-  }));
+  });
 
-  it('should not emit if debounce time has not passed', fakeAsync(() => {
+  it('should not emit if debounce time has not passed', () => {
     const spy = vi.spyOn(component.filterChange, 'emit');
 
     component.filterForm.patchValue({ search: 'pika' });
 
-    // Avanzamos solo 100ms
-    tick(100);
+    vi.advanceTimersByTime(100);
     expect(spy).not.toHaveBeenCalled();
-    
-    // Avanzamos el resto
-    tick(200);
+
+    vi.advanceTimersByTime(200);
     expect(spy).toHaveBeenCalled();
-  }));
+  });
 });
