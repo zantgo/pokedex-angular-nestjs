@@ -13,11 +13,10 @@ import { InvertNamePipe } from '../../pipes/invert-name-pipe';
   styleUrls: ['./pokemon-table.css'],
 })
 export class PokemonTableComponent {
-  // Inyección del estado global (Angular 17+ inject function)
   private state = inject(PokedexState);
 
-  // Exponemos los signals del estado para usarlos directamente en el HTML
-  readonly pokemons = this.state.pokemonList;
-  readonly isLoading = this.state.isLoading;
-  readonly meta = this.state.currentMetadata;
+  // Estas son las propiedades que tu HTML está buscando
+  public readonly pokemons = this.state.pokemonList;
+  public readonly isLoading = this.state.isLoading;
+  public readonly meta = this.state.currentMetadata;
 }

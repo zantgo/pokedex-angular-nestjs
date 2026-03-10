@@ -33,14 +33,19 @@ export class PokemonFiltersComponent implements OnInit, OnDestroy {
     this.filterForm.valueChanges
       .pipe(
         debounceTime(300), // Espera 300ms tras la última tecla pulsada
-        distinctUntilChanged(), // Solo dispara si el valor realmente cambió
+        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
         takeUntil(this.destroy$) // Limpia la suscripción al destruir el componente
       )
       .subscribe((values) => {
-        // Limpiar valores nulos antes de emitir para mantener el contrato limpio
-        const cleanFilters = Object.fromEntries(
-          Object.entries(values).filter(([_, v]) => v !== null && v !== '')
-        );
+        // Limpiar valores nulos o vacíos antes de emitir para mantener el contrato limpio
+        const cleanFilters: any = {};
+        Object.keys(values).forEach(key => {
+          const value = values[key];
+          if (value !== null && value !== undefined && value !== '') {
+            cleanFilters[key] = value;
+          }
+        });
+
         this.filterChange.emit(cleanFilters as PokemonQuery);
       });
   }

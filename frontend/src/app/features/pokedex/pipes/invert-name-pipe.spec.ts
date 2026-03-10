@@ -21,15 +21,15 @@ describe('InvertNamePipe', () => {
     expect(pipe.transform('   ')).toBe('-');
   });
 
-  it('should transform "bulbasaur" to "BULBASAUR"', () => {
-    expect(pipe.transform('bulbasaur')).toBe('BULBASAUR');
+  it('should invert "bulbasaur" to "ruasablub"', () => {
+    expect(pipe.transform('bulbasaur')).toBe('ruasablub');
   });
 
-  it('should keep "PIKACHU" as "PIKACHU"', () => {
-    expect(pipe.transform('PIKACHU')).toBe('PIKACHU');
+  it('should invert "Pikachu" to "uhcakiP"', () => {
+    expect(pipe.transform('Pikachu')).toBe('uhcakiP');
   });
 
-  it('should transform "charizard" correctly regardless of current case', () => {
-    expect(pipe.transform('charizard')).toBe('CHARIZARD');
+  it('should invert a single character correctly', () => {
+    expect(pipe.transform('a')).toBe('a');
   });
 });

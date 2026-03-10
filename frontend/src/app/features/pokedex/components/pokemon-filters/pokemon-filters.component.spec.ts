@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PokemonFiltersComponent } from './pokemon-filters.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { vi } from 'vitest'; // Importación explícita para Vitest
 
 describe('PokemonFiltersComponent', () => {
   let component: PokemonFiltersComponent;
@@ -21,8 +22,8 @@ describe('PokemonFiltersComponent', () => {
   });
 
   it('should emit filterChange after debounceTime', fakeAsync(() => {
-    // Espía para el EventEmitter
-    const spy = jest.spyOn(component.filterChange, 'emit');
+    // Usamos vi.spyOn en lugar de jest.spyOn
+    const spy = vi.spyOn(component.filterChange, 'emit');
 
     // Cambiamos el valor del input search
     component.filterForm.patchValue({ search: 'pika' });
@@ -38,7 +39,7 @@ describe('PokemonFiltersComponent', () => {
   }));
 
   it('should clean empty values before emitting', fakeAsync(() => {
-    const spy = jest.spyOn(component.filterChange, 'emit');
+    const spy = vi.spyOn(component.filterChange, 'emit');
 
     // Emitimos con campos vacíos
     component.filterForm.patchValue({ search: '', type: 'grass' });
@@ -50,14 +51,14 @@ describe('PokemonFiltersComponent', () => {
   }));
 
   it('should not emit if debounce time has not passed', fakeAsync(() => {
-    const spy = jest.spyOn(component.filterChange, 'emit');
+    const spy = vi.spyOn(component.filterChange, 'emit');
 
     component.filterForm.patchValue({ search: 'pika' });
 
     // Avanzamos solo 100ms
     tick(100);
     expect(spy).not.toHaveBeenCalled();
-
+    
     // Avanzamos el resto
     tick(200);
     expect(spy).toHaveBeenCalled();

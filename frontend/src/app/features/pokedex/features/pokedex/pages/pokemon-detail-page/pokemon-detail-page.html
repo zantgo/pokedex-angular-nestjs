@@ -1,1 +1,61 @@
-<p>pokemon-detail-page works!</p>
+<div class="p-8 max-w-2xl mx-auto">
+  @if (isLoading()) {
+    <!-- Estado de carga -->
+    <div class="text-center py-20 text-gray-500 animate-pulse">
+      <p class="text-xl">Analizando espécimen...</p>
+    </div>
+  } @else if (pokemon()) {
+    <!-- Contenido del Detalle -->
+    <div class="bg-white p-8 shadow-xl rounded-2xl border border-gray-100">
+      <header class="border-b border-gray-200 pb-4 mb-6">
+        <h1 class="text-5xl font-extrabold text-gray-900 capitalize tracking-tight">
+          {{ pokemon()!.name | invertName }}
+        </h1>
+        <p class="text-sm text-gray-400 mt-2">ID Nacional: #{{ pokemon()!.pokedexId }}</p>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Datos Físicos</h2>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-lg text-gray-700">
+              <span class="font-semibold">Altura:</span> {{ pokemon()!.height | cm }}
+            </p>
+            <p class="text-lg text-gray-700">
+              <span class="font-semibold">Peso:</span> {{ pokemon()!.weight | kg:2 }}
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Categoría</h2>
+          <div class="flex flex-wrap gap-2">
+            @for (type of pokemon()!.types; track type) {
+              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+                {{ type }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <footer class="mt-10 pt-6 border-t border-gray-100">
+        <button 
+          (click)="history.back()" 
+          class="flex items-center gap-2 bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+          ← Volver al catálogo
+        </button>
+      </footer>
+    </div>
+  } @else {
+    <!-- Caso de error o no encontrado -->
+    <div class="text-center py-20">
+      <h2 class="text-2xl font-bold text-red-600">Espécimen no encontrado</h2>
+      <button 
+        (click)="history.back()" 
+        class="mt-4 text-blue-500 underline">
+        Regresar a la lista
+      </button>
+    </div>
+  }
+</div>

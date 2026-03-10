@@ -1,8 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Pipe para transformar nombres de Pokémon a formato visual.
- * Convierte el nombre a mayúsculas y maneja valores nulos/undefined.
+ * Pipe para invertir el nombre de un Pokémon.
+ * Ejemplo: "bulbasaur" -> "ruasablub"
  * Uso: {{ pokemon.name | invertName }}
  */
 @Pipe({
@@ -12,15 +12,15 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class InvertNamePipe implements PipeTransform {
   /**
    * @param value El nombre del Pokémon (string).
-   * @returns El nombre en mayúsculas o un guion si el valor no es válido.
+   * @returns El nombre invertido o un guion si el valor no es válido.
    */
   transform(value: string | null | undefined): string {
-    // Protección contra valores nulos o vacíos durante la carga
+    // Protección contra valores nulos, vacíos o espacios
     if (!value || value.trim().length === 0) {
       return '-';
     }
 
-    // Transformación: Nombre en mayúsculas (se puede extender a otros formatos en el futuro)
-    return value.toUpperCase();
+    // Lógica de inversión: split -> reverse -> join
+    return value.split('').reverse().join('');
   }
 }
